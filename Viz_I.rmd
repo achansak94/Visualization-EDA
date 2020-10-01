@@ -167,7 +167,6 @@ Ridge plots --- most popular plot of 2017
 weather_df %>% 
   ggplot(aes(x = tmin, y = name)) +
   geom_density_ridges()
-+
 
 ```
 
