@@ -44,7 +44,7 @@ weather_df %>%
 ```{r}
 weather_df %>% 
     ggplot(aes(x = tmin, y = tmax, color=name)) +
-    geom_point(alpha=0.5)
+    geom_point(alpha=0.5) +
     labs(
         title = "Temperature Plot",
         x= "Minimum daily temperature(C)",
@@ -53,7 +53,47 @@ weather_df %>%
     )
 ```
 
+## Scales 
 
+Start with the same plot; x and y scales.
+
+
+```{r}
+weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+  scale_x_continuous(
+    breaks = c(-15, 0, 15),
+    labels = c("-15 C","0","15")
+    ) +
+  scale_y_continuous(
+    position = "right"
+  )
+  
+```
+
+Look at color scales.
+
+```{r}
+weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+  scale_color_hue(
+    name = "location",
+    h = c(100, 300))
+```
 
 
 
