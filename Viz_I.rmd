@@ -93,8 +93,39 @@ weather_df %>%
  viridis::scale_colour_viridis(
    name = "location",
     discrete = TRUE)
-
 ```
+
+
+## Themes 
+
+Shift the legend. 
+```{r}
+weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+ viridis::scale_colour_viridis(
+   name = "location",
+    discrete = TRUE) +
+  theme_minimal() +
+  theme(legend.position =  "bottom")
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
