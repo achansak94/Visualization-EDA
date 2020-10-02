@@ -1,13 +1,15 @@
 ---
-title: "Visualization I"
-subtitle: "Part I"
+title: "Visualization II"
+subtitle: "Part II"
 output: github_document
 ---
 
 ```{r}
 library(tidyverse)
-library(ggridges)
+library(patchwork)
 ```
+
+## Load the weather data 
 
 ```{r}
 weather_df = 
@@ -29,179 +31,27 @@ weather_df =
 weather_df
 ```
 
-
-## Scatterplots!
-
-Create my first scatterplot ever. 
-
-```{r}
-ggplot(weather_df, aes(x = tmin, y = tmax)) + geom_point()
-```
-
-New approach, same plot. 
+## Remember this plot...?
 
 ```{r}
 weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax)) + geom_point()
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5)
 ```
 
-Save and edit a plot object
-
-```{r}
-weather_plot =
-  weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax)) 
-
-weather_plot + geom_point()
-```
-
-
-## Advanced scatterplot
+## Labels
 
 ```{r}
 weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax, color = name)) + 
-    geom_point() +
-    geom_smooth(se = FALSE) 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5)
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    )
 ```
-
-What about the `aes` placement..?
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax)) +
-  geom_point(aes(color = name)) +
-  geom_smooth()
-```
-
-Let's facet same things!!!
-
-```{r}
-weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax, color = name)) + 
-    geom_point(alpha = 0.2) +
-    geom_smooth(se = FALSE) +
-    facet_grid(. ~ name)
-```
-
-```{r}
-weather_df %>% 
-    ggplot(aes(x = date, y = tmax, color = name)) +
-    geom_point(aes(size = prcp),alpha = 0.5) + 
-    geom_smooth(se = FALSE) +
-    facet_grid(. ~ name)
-```
-
-
-## Some small notes 
-
-How many geoms have to exist?
-
-You can have whatever geoms you want. 
-
-```{r}
-weather_df %>% 
-    ggplot(aes(x=tmin, y=tmax, color=name)) +
-    geom_smooth(se=FALSE)
-```
-
-You can use a neat geom!
-
-```{r}
-weather_df %>% 
-    ggplot(aes(x=tmin, y=tmax)) +
-    geom_density2d() +
-    geom_point(alpha = 0.3)
-```
-
-
-## Univariate Plots 
-
-Histographs are great. 
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = tmin)) +
-  geom_histogram()
-```
-
-Can we add color..
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = tmin, fill = name)) +
-  geom_histogram() +
-  facet_grid(. ~ name)
-```
-
-Let's try and new geometry!
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = tmin, fill = name)) +
-  geom_density (alpha=0.3)
-```
-
-
-What about box plots?
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = name, y = tmin)) +
-  geom_boxplot()
-```
-
-Trendy plots :)
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = name, y = tmin, fill = name)) +
-  geom_violin(alpha = 0.5) +
-  stat_summary()
-```
-
-
-Ridge plots --- most popular plot of 2017 
-
-```{r}
-weather_df %>% 
-  ggplot(aes(x = tmin, y = name)) +
-  geom_density_ridges()
-```
-
-
-## Save and Embed 
-
-```{r}
-weather_plot=
-weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax, color = name)) +
-  geom_point(alpha = 0.5)
-
-ggsave("./results/weather_plot.pdf", weather_plot, width = 8, height = 5) 
-```
-
-What about embedding... 
-
-```{r, fig.width==6, fig.height=3}
-weather_plot
-```
-
-Embed at different size. 
-
-```{r, fig.width==12, fig.height=6 }
-weather_plot
-```
-
-
-
-
-
-
-
-
-
-
 
 
 
