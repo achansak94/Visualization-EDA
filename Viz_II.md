@@ -1,24 +1,26 @@
-Visualization I
+Visualization II
 ================
 
 ``` r
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ──── tidyverse 1.3.0 ──
+    ## ── Attaching packages ──────────────── tidyverse 1.3.0 ──
 
     ## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
     ## ✓ tibble  3.0.3     ✓ dplyr   1.0.2
     ## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ─────── tidyverse_conflicts() ──
+    ## ── Conflicts ─────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
-library(ggridges)
+library(patchwork)
 ```
+
+## Load the weather data
 
 ``` r
 weather_df = 
@@ -79,102 +81,192 @@ weather_df
     ## 10 CentralPark_NY USW00094728 2017-01-10     0   7.8  -6  
     ## # … with 1,085 more rows
 
-## Scatterplots\!
-
-Create my first scatterplot ever.
+## Remember this plot…?
 
 ``` r
-ggplot(weather_df, aes(x = tmin, y = tmax)) + geom_point()
+weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5)
 ```
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
 
 ![](Viz_I_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-New approach, same plot.
+## Labels
 
 ``` r
 weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax)) + geom_point()
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    )
 ```
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
 
 ![](Viz_I_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-Save and edit a plot object
+## Scales
+
+Start with the same plot; x and y scales.
 
 ``` r
-weather_plot =
-  weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax)) 
-
-weather_plot + geom_point()
+weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+  scale_x_continuous(
+    breaks = c(-15, 0, 15),
+    labels = c("-15 C","0","15")
+    ) +
+  scale_y_continuous(
+    position = "right"
+  )
 ```
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
 
 ![](Viz_I_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## Advanced scatterplot
+Look at color scales.
 
 ``` r
 weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax, color = name)) + 
-    geom_point() +
-    geom_smooth(se = FALSE) 
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+ viridis::scale_colour_viridis(
+   name = "location",
+    discrete = TRUE)
 ```
-
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_smooth).
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
 
 ![](Viz_I_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-What about the `aes` placement..?
+## Themes
+
+Shift the legend.
 
 ``` r
 weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax)) +
-  geom_point(aes(color = name)) +
-  geom_smooth()
+    ggplot(aes(x = tmin, y = tmax, color=name)) +
+    geom_point(alpha=0.5) +
+    labs(
+        title = "Temperature Plot",
+        x= "Minimum daily temperature(C)",
+        y = "Maximum datily temparture (C)",
+        caption = "Data from rnoaa package; temperatures in 2017."
+    ) +
+ viridis::scale_colour_viridis(
+   name = "location",
+    discrete = TRUE) +
+  theme_minimal() +
+  theme(legend.position =  "bottom")
 ```
-
-    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_smooth).
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
 
 ![](Viz_I_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-Let’s facet same things\!\!\!
+\#\#Setting options
+
+``` r
+library(tidyverse)
+
+knitr::opts_chunk$set(
+    fig.width = 6,
+    fig.asp = 6,
+    out.width = "90%"
+)
+
+
+theme_set(theme_minimal() + theme(legend.position =  "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+ 
+scale_color_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## Data orgs in `geom`
+
+``` r
+central_park = 
+  weather_df %>% 
+  filter(name == "CentralPark_NY")
+
+waikiki = 
+  weather_df %>% 
+  filter(name == "Waikiki_HA")
+  
+ggplot(data = waikiki, aes(x = date, y =tmax, color = name)) +
+  geom_point() +
+  geom_line(data=central_park) 
+```
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+<img src="Viz_I_files/figure-gfm/unnamed-chunk-8-1.png" width="90%" />
+
+## `patchwork`
 
 ``` r
 weather_df %>% 
-    ggplot(aes(x = tmin, y = tmax, color = name)) + 
-    geom_point(alpha = 0.2) +
-    geom_smooth(se = FALSE) +
+    ggplot(aes(x = tmin, fill = name)) +
+    geom_density(alpha=0.5) + 
     facet_grid(. ~ name)
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+    ## Warning: Removed 15 rows containing non-finite values (stat_density).
 
-    ## Warning: Removed 15 rows containing non-finite values (stat_smooth).
+<img src="Viz_I_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
+
+What happens when you want multipanel plots but can’t facet …?
+
+``` r
+tmax_tmin_p = 
+  weather_df %>% 
+    ggplot(aes(x = tmin, y = tmax, fill = name)) +
+    geom_point(alpha=0.5) + 
+  theme(legend.position = "none")
+
+
+prcp_dens_p=
+  weather_df %>% 
+    filter(prcp > 0) %>%
+    ggplot(aes(x = prcp, fill = name)) +
+     geom_density(alpha = 0.5)
+
+tmax_date_p =
+  weather_df %>% 
+    ggplot(aes(x = date, y = tmax, color = name)) +
+    geom_point() +
+    geom_smooth(se = FALSE) +
+    theme(legend.position = "none")
+  
+(tmax_tmin_p + prcp_dens_p)/tmax_date_p
+```
 
     ## Warning: Removed 15 rows containing missing values (geom_point).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
-
-``` r
-weather_df %>% 
-    ggplot(aes(x = date, y = tmax, color = name)) +
-    geom_point(aes(size = prcp),alpha = 0.5) + 
-    geom_smooth(se = FALSE) +
-    facet_grid(. ~ name)
-```
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -182,156 +274,40 @@ weather_df %>%
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](Viz_I_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+<img src="Viz_I_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
-## Some small notes
+## Data Manipulation
 
-How many geoms have to exist?
-
-You can have whatever geoms you want.
+Control you factors.
 
 ``` r
 weather_df %>% 
-    ggplot(aes(x=tmin, y=tmax, color=name)) +
-    geom_smooth(se=FALSE)
+  mutate(
+    name = factor(name),
+    name = forcats::fct_relevel(name, c("Waikiki_HA"))
+  ) %>% 
+  ggplot(aes(x = name, y = tmax, fill = name)) +
+  geom_violin(alpha = 0.5) 
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+    ## Warning: Removed 3 rows containing non-finite values (stat_ydensity).
 
-    ## Warning: Removed 15 rows containing non-finite values (stat_smooth).
+<img src="Viz_I_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
 
-![](Viz_I_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-You can use a neat geom\!
+What if I wanted densitites for tmin and tmax simultaneously?
 
 ``` r
 weather_df %>% 
-    ggplot(aes(x=tmin, y=tmax)) +
-    geom_density2d() +
-    geom_point(alpha = 0.3)
+  pivot_longer(
+    tmax:tmin, 
+    names_to = "observations",
+    values_to = "temperatures",
+  ) %>% 
+  ggplot(aes(x = temperatures, fill = observations)) +
+  geom_density(alpha = 0.5)+
+  facet_grid(. ~ name )
 ```
 
-    ## Warning: Removed 15 rows containing non-finite values (stat_density2d).
+    ## Warning: Removed 18 rows containing non-finite values (stat_density).
 
-    ## Warning: Removed 15 rows containing missing values (geom_point).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
-
-## Univariate Plots
-
-Histographs are great.
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = tmin)) +
-  geom_histogram()
-```
-
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_bin).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-
-Can we add color..
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = tmin, fill = name)) +
-  geom_histogram() +
-  facet_grid(. ~ name)
-```
-
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_bin).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
-Let’s try and new geometry\!
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = tmin, fill = name)) +
-  geom_density (alpha=0.3)
-```
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_density).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-What about box plots?
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = name, y = tmin)) +
-  geom_boxplot()
-```
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_boxplot).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
-
-Trendy plots :)
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = name, y = tmin, fill = name)) +
-  geom_violin(alpha = 0.5) +
-  stat_summary()
-```
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_ydensity).
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_summary).
-
-    ## No summary function supplied, defaulting to `mean_se()`
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
-
-Ridge plots — most popular plot of 2017
-
-``` r
-weather_df %>% 
-  ggplot(aes(x = tmin, y = name)) +
-  geom_density_ridges()
-```
-
-    ## Picking joint bandwidth of 1.67
-
-    ## Warning: Removed 15 rows containing non-finite values (stat_density_ridges).
-
-![](Viz_I_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
-
-## Save and Embed
-
-``` r
-weather_plot=
-weather_df %>% 
-  ggplot(aes(x = tmin, y = tmax, color = name)) +
-  geom_point(alpha = 0.5)
-
-ggsave("./results/weather_plot.pdf", weather_plot, width = 8, height = 5) 
-```
-
-    ## Warning: Removed 15 rows containing missing values (geom_point).
-
-What about embedding…
-
-``` r
-weather_plot
-```
-
-    ## Warning: Removed 15 rows containing missing values (geom_point).
-
-![](Viz_I_files/figure-gfm/fig.width==6-1.png)<!-- -->
-
-Embed at different size.
-
-``` r
-weather_plot
-```
-
-    ## Warning: Removed 15 rows containing missing values (geom_point).
-
-![](Viz_I_files/figure-gfm/fig.width==12-1.png)<!-- -->
+<img src="Viz_I_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
